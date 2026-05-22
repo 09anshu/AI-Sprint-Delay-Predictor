@@ -12,7 +12,10 @@ const express = require('express');
 const axios = require('axios');
 const Sprint = require('../models/Sprint');
 const Project = require('../models/Project');
+const User = require('../models/User');
+const ActivityLog = require('../models/ActivityLog');
 const auth = require('../middleware/auth');
+const emailService = require('../services/emailService');
 
 const router = express.Router();
 
@@ -131,6 +134,61 @@ router.post('/predict', auth, async (req, res) => {
       confidence: prediction.confidence,
       riskLevel: prediction.riskLevel,
     };
+
+    // --- Smart Email Alert Logic ---
+    const isHighRisk = prediction.confidence > 0.6 || prediction.riskLevel === 'High' || prediction.riskLevel === 'Critical';
+    
+    if (isHighRisk) {
+      let shouldSendEmail = false;
+      
+      if (!sprint.alertState || !sprint.alertState.emailSent) {
+        shouldSendEmail = true;
+      } else {
+        // Prevent duplicate spam. Only resend if risk has significantly increased.
+        // e.g. confidence jumped by more than 10%, or risk level escalated
+        const confidenceJump = prediction.confidence - (sprint.alertState.lastConfidence || 0);
+        const escalatedToCritical = prediction.riskLevel === 'Critical' && sprint.alertState.lastRiskLevel !== 'Critical';
+        
+        if (confidenceJump > 0.1 || escalatedToCritical) {
+          shouldSendEmail = true;
+        }
+      }
+
+      if (shouldSendEmail) {
+        try {
+          const project = await Project.findById(sprint.projectId);
+          // Fetch the currently logged-in user (who triggered the prediction) instead of the project owner
+          const user = await User.findById(req.user.id);
+          
+          if (user) {
+            const emailSent = await emailService.sendDelayAlertEmail(user, project, sprint, prediction);
+            
+            if (emailSent) {
+              sprint.alertState = {
+                emailSent: true,
+                lastSentAt: new Date(),
+                lastConfidence: prediction.confidence,
+                lastRiskLevel: prediction.riskLevel
+              };
+              
+              // Log the email action
+              await new ActivityLog({
+                userId: req.user.id,
+                userEmail: req.user.email, // using the user executing the prediction
+                action: 'email_alert',
+                target: 'sprint',
+                targetId: sprint._id.toString(),
+                details: `Email alert sent to ${user.email} (Risk: ${prediction.riskLevel}, Prob: ${Math.round(prediction.confidence*100)}%)`,
+                ip: req.ip
+              }).save();
+            }
+          }
+        } catch (emailErr) {
+          console.error("Failed to send/log email alert:", emailErr);
+        }
+      }
+    }
+    // --- End Email Logic ---
 
     await sprint.save();
 

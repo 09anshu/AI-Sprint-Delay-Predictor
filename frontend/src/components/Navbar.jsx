@@ -1,12 +1,13 @@
 /**
  * Navbar.jsx — Top navigation bar component.
  * 
- * Shows app branding, user info, and logout button.
+ * Shows app branding, notification bell with dropdown, user info, and logout button.
  * Only visible when authenticated.
  */
 
 import { useAuth } from '../context/AuthContext';
-import { HiOutlineLogout, HiOutlineBell, HiOutlineSparkles } from 'react-icons/hi';
+import { HiOutlineLogout, HiOutlineSparkles } from 'react-icons/hi';
+import NotificationDropdown from './NotificationDropdown';
 
 const Navbar = () => {
   const { user, logout } = useAuth();
@@ -26,11 +27,8 @@ const Navbar = () => {
 
         {/* Right side */}
         <div className="flex items-center gap-4">
-          {/* Notifications */}
-          <button className="relative p-2 rounded-xl text-dark-400 hover:text-dark-200 hover:bg-dark-700/50 transition-colors">
-            <HiOutlineBell className="w-5 h-5" />
-            <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-primary-500"></span>
-          </button>
+          {/* Notification Bell + Dropdown */}
+          <NotificationDropdown />
 
           {/* User */}
           <div className="flex items-center gap-3 pl-4 border-l border-dark-700">

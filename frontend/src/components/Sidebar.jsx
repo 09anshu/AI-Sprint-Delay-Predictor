@@ -1,24 +1,28 @@
 /**
  * Sidebar.jsx — Side navigation component.
  * 
- * Provides navigation links to Dashboard, Projects pages.
- * Highlights the active route.
+ * Provides navigation links to Dashboard, Projects, and Alert History pages.
+ * Highlights the active route. Shows unread alert badge on Alert History.
  */
 
 import { NavLink } from 'react-router-dom';
+import { useAlerts } from '../context/AlertContext';
 import { 
   HiOutlineViewGrid, 
   HiOutlineFolder, 
   HiOutlineLightningBolt,
-  HiOutlineChartBar,
+  HiOutlineBell,
 } from 'react-icons/hi';
 
 const navItems = [
   { to: '/dashboard', label: 'Dashboard', icon: HiOutlineViewGrid },
   { to: '/projects', label: 'Projects', icon: HiOutlineFolder },
+  { to: '/alerts', label: 'Alert History', icon: HiOutlineBell },
 ];
 
 const Sidebar = () => {
+  const { unreadCount } = useAlerts();
+
   return (
     <aside className="fixed left-0 top-16 bottom-0 w-64 bg-dark-900/50 backdrop-blur-xl border-r border-dark-700/50 z-40 hidden lg:block">
       <div className="flex flex-col h-full p-4">
@@ -38,6 +42,12 @@ const Sidebar = () => {
             >
               <item.icon className="w-5 h-5" />
               {item.label}
+              {/* Unread badge for Alert History */}
+              {item.to === '/alerts' && unreadCount > 0 && (
+                <span className="ml-auto min-w-[20px] h-5 flex items-center justify-center rounded-full bg-red-500 text-white text-[10px] font-bold px-1.5">
+                  {unreadCount > 99 ? '99+' : unreadCount}
+                </span>
+              )}
             </NavLink>
           ))}
         </nav>
@@ -58,3 +68,4 @@ const Sidebar = () => {
 };
 
 export default Sidebar;
+

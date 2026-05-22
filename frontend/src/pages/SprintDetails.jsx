@@ -14,6 +14,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import api from '../api/axios';
 import toast from 'react-hot-toast';
 import PredictionResult from '../components/PredictionResult';
+import { useAlerts } from '../context/AlertContext';
 import {
   HiOutlinePlus,
   HiOutlineArrowLeft,
@@ -31,6 +32,7 @@ import {
 const SprintDetails = () => {
   const { projectId } = useParams();
   const navigate = useNavigate();
+  const { addAlert } = useAlerts();
   const [sprints, setSprints] = useState([]);
   const [project, setProject] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -119,10 +121,26 @@ const SprintDetails = () => {
         riskLevel: riskLevel,
         dependencies: predictSprint.dependencies,
       });
+      const prediction = res.data.prediction;
       setActivePrediction({
         sprintId: predictSprint._id,
-        ...res.data.prediction,
+        ...prediction,
       });
+
+      // Trigger alert if conditions met
+      addAlert(
+        {
+          sprintName: predictSprint.sprintName,
+          duration: predictSprint.duration,
+          storyPoints: predictSprint.storyPoints,
+          completedPoints: predictSprint.completedPoints || 0,
+          bugs: predictSprint.bugs || 0,
+          dependencies: predictSprint.dependencies || 0,
+        },
+        prediction,
+        project?.projectName || 'Unknown Project'
+      );
+
       toast.success('Prediction complete!');
       fetchData();
     } catch (error) {

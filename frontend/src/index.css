@@ -113,4 +113,22 @@
       radial-gradient(at 80% 0%, rgba(20, 184, 166, 0.06) 0px, transparent 50%),
       radial-gradient(at 0% 80%, rgba(16, 185, 129, 0.06) 0px, transparent 50%);
   }
+
+  /* Thin scrollbar for notification dropdown */
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 4px;
+  }
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    @apply bg-dark-600/50 rounded-full;
+  }
 }
+
+/* ─── Toast Overrides ─────────────────────────────────────────────────── */
+/* Ensure custom toasts have proper positioning */
+[data-sonner-toaster], div[role="status"] {
+  z-index: 9999 !important;
+}
+

@@ -60,6 +60,12 @@ const sprintSchema = new mongoose.Schema({
     confidence: { type: Number, default: 0 },
     riskLevel: { type: String, default: '' },
   },
+  alertState: {
+    emailSent: { type: Boolean, default: false },
+    lastSentAt: { type: Date },
+    lastConfidence: { type: Number, default: 0 },
+    lastRiskLevel: { type: String, default: '' },
+  },
   createdAt: {
     type: Date,
     default: Date.now,

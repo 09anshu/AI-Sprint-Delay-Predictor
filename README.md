@@ -184,6 +184,18 @@ Opens at → **http://localhost:5174**
 
 ---
 
+## Vercel Deployment
+
+This repo contains two separate Vite apps, so deploy them as two Vercel projects:
+
+1. Create a Vercel project for `frontend/` and set `VITE_API_BASE_URL` to the public URL of your backend API.
+2. Create a second Vercel project for `admin/` and set `VITE_ADMIN_API_BASE_URL` to the same backend URL, unless you want to keep a separate admin API host.
+3. Keep the backend and ML service on a host that supports long-running services. Vercel is a good fit for the React frontends, but this codebase’s Express API and Flask ML service are not Vercel-ready without refactoring into serverless functions.
+
+Each frontend includes a `vercel.json` rewrite so React Router routes continue to work on refresh.
+
+---
+
 ## 🔑 Environment Variables
 
 Create `backend/.env` with the following:

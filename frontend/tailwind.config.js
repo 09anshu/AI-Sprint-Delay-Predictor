@@ -43,6 +43,11 @@ export default {
         'slide-in-left': 'slideInLeft 0.3s ease-out',
         'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
         'bounce-slow': 'bounce 2s infinite',
+        'toast-in': 'toastIn 0.4s cubic-bezier(0.21, 1.02, 0.73, 1) forwards',
+        'toast-out': 'toastOut 0.3s ease-in forwards',
+        'scale-in': 'scaleIn 0.25s cubic-bezier(0.21, 1.02, 0.73, 1) forwards',
+        'badge-pulse': 'badgePulse 2s ease-in-out infinite',
+        'toast-progress': 'toastProgress 5s linear forwards',
       },
       keyframes: {
         fadeIn: {
@@ -56,6 +61,26 @@ export default {
         slideInLeft: {
           '0%': { opacity: '0', transform: 'translateX(-20px)' },
           '100%': { opacity: '1', transform: 'translateX(0)' },
+        },
+        toastIn: {
+          '0%': { opacity: '0', transform: 'translateX(100%) scale(0.95)' },
+          '100%': { opacity: '1', transform: 'translateX(0) scale(1)' },
+        },
+        toastOut: {
+          '0%': { opacity: '1', transform: 'translateX(0) scale(1)' },
+          '100%': { opacity: '0', transform: 'translateX(100%) scale(0.95)' },
+        },
+        scaleIn: {
+          '0%': { opacity: '0', transform: 'scale(0.92)' },
+          '100%': { opacity: '1', transform: 'scale(1)' },
+        },
+        badgePulse: {
+          '0%, 100%': { transform: 'scale(1)' },
+          '50%': { transform: 'scale(1.15)' },
+        },
+        toastProgress: {
+          '0%': { width: '100%' },
+          '100%': { width: '0%' },
         },
       },
       backdropBlur: {

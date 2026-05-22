@@ -27,7 +27,7 @@ const activityLogSchema = new mongoose.Schema({
   action: {
     type: String,
     required: true,
-    enum: ['login', 'create', 'update', 'delete', 'predict', 'block', 'unblock', 'admin_login', 'settings_update'],
+    enum: ['login', 'create', 'update', 'delete', 'predict', 'block', 'unblock', 'admin_login', 'settings_update', 'email_alert'],
   },
   target: {
     type: String,

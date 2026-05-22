@@ -40,7 +40,7 @@ model = joblib.load(os.path.join(model_dir, 'model.pkl'))
 label_encoder = joblib.load(os.path.join(model_dir, 'label_encoder.pkl'))
 feature_names = joblib.load(os.path.join(model_dir, 'features.pkl'))
 
-print(f"✅ Model loaded with features: {feature_names}")
+print(f"[OK] Model loaded with features: {feature_names}")
 
 
 def map_risk_level_to_numeric(risk_level):
@@ -132,14 +132,14 @@ def predict():
             }
         }
         
-        print(f"📊 Prediction: {response['label']} | Severity: {severity} | Confidence: {confidence:.2f}")
+        print(f"[PREDICTION] Prediction: {response['label']} | Severity: {severity} | Confidence: {confidence:.2f}")
         return jsonify(response)
         
     except Exception as e:
-        print(f"❌ Error: {str(e)}")
+        print(f"[ERROR] Error: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
 
 if __name__ == '__main__':
-    print("🚀 Starting ML Prediction API on port 5001...")
+    print("[START] Starting ML Prediction API on port 5001...")
     app.run(host='0.0.0.0', port=5001, debug=True)

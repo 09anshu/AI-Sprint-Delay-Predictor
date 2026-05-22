@@ -3,13 +3,15 @@
  * 
  * Defines all routes and provides layout structure:
  *   - Public routes: Login, Register
- *   - Protected routes: Dashboard, Projects, Sprint Details
+ *   - Protected routes: Dashboard, Projects, Sprint Details, Alert History
  *   - Layout includes Navbar + Sidebar for authenticated pages
+ *   - AlertProvider wraps all protected routes for alert state
  */
 
 import { BrowserRouter as Router, Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { AlertProvider } from './context/AlertContext';
 import Navbar from './components/Navbar';
 import Sidebar from './components/Sidebar';
 import Login from './pages/Login';
@@ -17,6 +19,7 @@ import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import Projects from './pages/Projects';
 import SprintDetails from './pages/SprintDetails';
+import AlertHistory from './pages/AlertHistory';
 
 /**
  * ProtectedRoute — Redirects to login if not authenticated.
@@ -37,15 +40,17 @@ const ProtectedRoute = () => {
   }
 
   return (
-    <div className="min-h-screen bg-dark-950 bg-mesh">
-      <Navbar />
-      <Sidebar />
-      <main className="lg:ml-64 pt-16 min-h-screen">
-        <div className="p-6 max-w-7xl mx-auto">
-          <Outlet />
-        </div>
-      </main>
-    </div>
+    <AlertProvider>
+      <div className="min-h-screen bg-dark-950 bg-mesh">
+        <Navbar />
+        <Sidebar />
+        <main className="lg:ml-64 pt-16 min-h-screen">
+          <div className="p-6 max-w-7xl mx-auto">
+            <Outlet />
+          </div>
+        </main>
+      </div>
+    </AlertProvider>
   );
 };
 
@@ -107,6 +112,7 @@ function App() {
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/projects" element={<Projects />} />
             <Route path="/sprints/:projectId" element={<SprintDetails />} />
+            <Route path="/alerts" element={<AlertHistory />} />
           </Route>
 
           {/* Default redirect */}

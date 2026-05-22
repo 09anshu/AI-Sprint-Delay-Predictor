@@ -12,6 +12,8 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../api/axios';
 import toast from 'react-hot-toast';
+import { useAlerts } from '../context/AlertContext';
+import AlertDetailModal from '../components/AlertDetailModal';
 import {
   HiOutlineFolder,
   HiOutlineLightningBolt,
@@ -19,6 +21,8 @@ import {
   HiOutlineCheckCircle,
   HiOutlineClock,
   HiOutlineChartBar,
+  HiOutlineShieldExclamation,
+  HiOutlineShieldCheck,
 } from 'react-icons/hi';
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip,
@@ -30,7 +34,9 @@ const COLORS = ['#10b981', '#f59e0b', '#ef4444'];
 const Dashboard = () => {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [selectedAlert, setSelectedAlert] = useState(null);
   const navigate = useNavigate();
+  const { alerts } = useAlerts();
 
   useEffect(() => {
     fetchDashboardStats();
@@ -137,6 +143,71 @@ const Dashboard = () => {
           </div>
         ))}
       </div>
+
+      {/* Active Alerts Card */}
+      {alerts.length > 0 && (
+        <div className="glass-card p-6 animate-slide-up">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <HiOutlineShieldExclamation className="w-5 h-5 text-red-400" />
+              <h2 className="text-lg font-semibold text-dark-200">🚨 Active Alerts</h2>
+              <span className="text-[10px] font-bold bg-red-500/15 text-red-400 px-2 py-0.5 rounded-full">
+                {alerts.length}
+              </span>
+            </div>
+            <button onClick={() => navigate('/alerts')} className="text-xs text-primary-400 hover:text-primary-300 transition-colors font-medium">
+              View all →
+            </button>
+          </div>
+          <div className="space-y-2">
+            {alerts.slice(0, 5).map((alert) => (
+              <div
+                key={alert.id}
+                onClick={() => setSelectedAlert(alert)}
+                className="flex items-center justify-between p-3.5 bg-dark-700/20 rounded-xl hover:bg-dark-700/40 transition-all duration-200 cursor-pointer group"
+              >
+                <div className="flex items-center gap-3">
+                  <div className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${
+                    alert.riskCategory === 'high' ? 'bg-red-500 shadow-lg shadow-red-500/30' :
+                    alert.riskCategory === 'medium' ? 'bg-amber-500 shadow-lg shadow-amber-500/30' :
+                    'bg-emerald-500 shadow-lg shadow-emerald-500/30'
+                  }`} />
+                  <div>
+                    <p className="text-sm font-medium text-dark-200 group-hover:text-dark-100 transition-colors">{alert.sprintName}</p>
+                    <p className="text-xs text-dark-500">{alert.projectName}</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border ${
+                    alert.riskCategory === 'high' ? 'bg-red-500/15 text-red-400 border-red-500/20' :
+                    alert.riskCategory === 'medium' ? 'bg-amber-500/15 text-amber-400 border-amber-500/20' :
+                    'bg-emerald-500/15 text-emerald-400 border-emerald-500/20'
+                  }`}>
+                    {alert.riskLevel}
+                  </span>
+                  <span className={`text-sm font-bold ${
+                    alert.riskCategory === 'high' ? 'text-red-400' :
+                    alert.riskCategory === 'medium' ? 'text-amber-400' : 'text-emerald-400'
+                  }`}>
+                    {alert.delayProbability}%
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* No alerts — on track message */}
+      {alerts.length === 0 && stats?.totalSprints > 0 && (
+        <div className="glass-card p-5 flex items-center gap-3 animate-fade-in">
+          <HiOutlineShieldCheck className="w-6 h-6 text-emerald-400 flex-shrink-0" />
+          <div>
+            <p className="text-sm font-medium text-emerald-400">All sprints on track ✅</p>
+            <p className="text-xs text-dark-400">No active delay alerts. Keep up the great work!</p>
+          </div>
+        </div>
+      )}
 
       {/* Charts Row */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -285,6 +356,10 @@ const Dashboard = () => {
           </div>
         )}
       </div>
+      {/* Alert Detail Modal */}
+      {selectedAlert && (
+        <AlertDetailModal alert={selectedAlert} onClose={() => setSelectedAlert(null)} />
+      )}
     </div>
   );
 };
